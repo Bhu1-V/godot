@@ -63,6 +63,7 @@ class EditorLog;
 class EditorPlugin;
 class EditorPluginList;
 class EditorQuickOpen;
+class CommandPalette;
 class EditorResourcePreview;
 class EditorRunNative;
 class EditorSettingsDialog;
@@ -335,6 +336,7 @@ private:
 	CenterContainer *tabs_center;
 	EditorQuickOpen *quick_open;
 	EditorQuickOpen *quick_run;
+	CommandPalette *command_palette;
 
 	HBoxContainer *main_editor_button_vb;
 	Vector<Button *> main_editor_buttons;
@@ -493,6 +495,9 @@ private:
 
 	void _quick_opened();
 	void _quick_run();
+	void _open_resource();
+	void _execute_command();
+	void _open_command_palette();
 
 	void _run(bool p_current = false, const String &p_custom = "");
 	void _run_native(const Ref<EditorExportPreset> &p_preset);

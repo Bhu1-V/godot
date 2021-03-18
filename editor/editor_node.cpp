@@ -67,6 +67,7 @@
 #include "servers/rendering/rendering_device.h"
 
 #include "editor/audio_stream_preview.h"
+#include "editor/command_palette.h"
 #include "editor/debugger/editor_debugger_node.h"
 #include "editor/dependency_editor.h"
 #include "editor/editor_about.h"
@@ -422,6 +423,8 @@ void EditorNode::_unhandled_input(const Ref<InputEvent> &p_event) {
 			_editor_select_next();
 		} else if (ED_IS_SHORTCUT("editor/editor_prev", p_event)) {
 			_editor_select_prev();
+		} else if (ED_IS_SHORTCUT("editor/command_palette", p_event)){
+			_open_command_palette();
 		}
 
 		if (old_editor != editor_plugin_screen) {
@@ -1005,6 +1008,10 @@ void EditorNode::_editor_select_prev() {
 	} while (!main_editor_buttons[editor]->is_visible());
 
 	_editor_select(editor);
+}
+
+void EditorNode::_open_command_palette() {
+	command_palette->open_popup();
 }
 
 Error EditorNode::load_resource(const String &p_resource, bool p_ignore_broken_deps) {
@@ -3684,6 +3691,16 @@ void EditorNode::_quick_opened() {
 
 void EditorNode::_quick_run() {
 	_run(false, quick_run->get_selected());
+}
+
+void EditorNode::_execute_command(){
+	print_line("execute command");
+	// todo : execute the action.
+}
+
+void EditorNode::_open_resource(){
+	print_line("open_resource");
+	// todo : open-resource same as _quick_open.
 }
 
 void EditorNode::notify_all_debug_sessions_exited() {
@@ -6900,6 +6917,14 @@ EditorNode::EditorNode() {
 	gui_base->add_child(quick_run);
 	quick_run->connect("quick_open", callable_mp(this, &EditorNode::_quick_run));
 
+	command_palette = memnew(CommandPalette);
+	gui_base->add_child(command_palette);
+	command_palette->connect("open_resource", callable_mp(this, &EditorNode::_open_resource));
+	command_palette->connect("execute_command", callable_mp(this, &EditorNode::_execute_command));
+
+
+
+
 	_update_recent_scenes();
 
 	editor_data.restore_editor_global_states();
@@ -6961,12 +6986,14 @@ EditorNode::EditorNode() {
 	ED_SHORTCUT("editor/editor_3d", TTR("Open 3D Editor"), KEY_MASK_ALT | KEY_2);
 	ED_SHORTCUT("editor/editor_script", TTR("Open Script Editor"), KEY_MASK_ALT | KEY_3);
 	ED_SHORTCUT("editor/editor_assetlib", TTR("Open Asset Library"), KEY_MASK_ALT | KEY_4);
+	ED_SHORTCUT("editor/command_palette", TTR("Open Command Palette"), KEY_MASK_CMD | KEY_MASK_SHIFT | KEY_P);
 #else
 	// Use the Ctrl modifier so F2 can be used to rename nodes in the scene tree dock.
 	ED_SHORTCUT("editor/editor_2d", TTR("Open 2D Editor"), KEY_MASK_CTRL | KEY_F1);
 	ED_SHORTCUT("editor/editor_3d", TTR("Open 3D Editor"), KEY_MASK_CTRL | KEY_F2);
 	ED_SHORTCUT("editor/editor_script", TTR("Open Script Editor"), KEY_MASK_CTRL | KEY_F3);
 	ED_SHORTCUT("editor/editor_assetlib", TTR("Open Asset Library"), KEY_MASK_CTRL | KEY_F4);
+	ED_SHORTCUT("editor/command_palette", TTR("Open Command Palette"), KEY_MASK_CTRL | KEY_MASK_SHIFT | KEY_A);
 #endif
 	ED_SHORTCUT("editor/editor_next", TTR("Open the next Editor"));
 	ED_SHORTCUT("editor/editor_prev", TTR("Open the previous Editor"));
