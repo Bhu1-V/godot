@@ -54,7 +54,7 @@ public:
 	void add_action_obj(StringName p_name, const Object *p_object, const StringName &p_method);
 	void remove_action(StringName p_name);
 
-	void get_action_list(List<StringName> *p_list) const;
+	void get_action_list(List<String> *p_list) const;
 	Callable get_action(StringName p_name);
 
 	// void add_on_action_executing(StringName p_name, const Callable &p_callable, Array params);
@@ -62,7 +62,7 @@ public:
 
 	void execute_action(StringName action_name, const Variant **params, int p_argcount);
 	// Variant execute_action_fold(const Variant **p_args, int p_argcount, Callable::CallError &r_error);
-	Callable get_execute_callable();
+	//Callable get_execute_callable();
 
 	//void clear_execute_cb();
 

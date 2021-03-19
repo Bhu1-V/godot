@@ -46,7 +46,7 @@ void EditorActions::remove_action(StringName p_name) {
 }
 
 // returns the list of callable names. So we can search.
-void EditorActions::get_action_list(List<StringName> *p_list) const {
+void EditorActions::get_action_list(List<String> *p_list) const {
 	callables.get_key_list(p_list);
 }
 
@@ -102,12 +102,12 @@ void EditorActions::execute_action(StringName action_name, const Variant **param
 	// }
 }
 
-Variant EditorActions::execute_action_fold(const Variant **p_args, int p_argcount, Callable::CallError &r_error) {
-	const Variant &p_name = *p_args[p_argcount - 1];
-	ERR_FAIL_COND_V_MSG(p_name.get_type() != Variant::STRING_NAME, Variant(), "Execute action failed because name was not StringName");
-	execute_action(p_name, p_args, p_argcount - 1);
-	return Variant();
-}
+//Variant EditorActions::execute_action_fold(const Variant **p_args, int p_argcount, Callable::CallError &r_error) {
+//	const Variant &p_name = *p_args[p_argcount - 1];
+//	ERR_FAIL_COND_V_MSG(p_name.get_type() != Variant::STRING_NAME, Variant(), "Execute action failed because name was not StringName");
+//	execute_action(p_name, p_args, p_argcount - 1);
+//	return Variant();
+//}
 
 void EditorActions::_execute_action(StringName action_name, Array params) {
 	Vector<Variant> v_arr;
@@ -118,9 +118,9 @@ void EditorActions::_execute_action(StringName action_name, Array params) {
 	execute_action(action_name, &ptr, v_arr.size());
 }
 
-Callable EditorActions::get_execute_callable() {
-	return Callable(this, "execute_action_fold");
-}
+//Callable EditorActions::get_execute_callable() {
+//	return Callable(this, "execute_action_fold");
+//}
 
 // void EditorActions::clear_execute_cb() {
 // 	callables_on_executed.clear();
@@ -129,9 +129,9 @@ Callable EditorActions::get_execute_callable() {
 
 Array EditorActions::_get_action_list() const {
 	Array ret;
-	List<StringName> lst;
+	List<String> lst;
 	get_action_list(&lst);
-	for (List<StringName>::Element *E = lst.front(); E; E = E->next()) {
+	for (List<String>::Element *E = lst.front(); E; E = E->next()) {
 		ret.append(E->get());
 	}
 	return ret;
@@ -150,26 +150,26 @@ void EditorActions::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("execute_action", "action", "params"), &EditorActions::_execute_action);
 
-	{
-		MethodInfo mi;
-		mi.name = "execute_action_fold";
-		mi.arguments.push_back(PropertyInfo(Variant::STRING_NAME, "name"));
-		mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p1"));
-		mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p2"));
-		mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p3"));
-		mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p4"));
-		mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p5"));
+	// {
+	// 	MethodInfo mi;
+	// 	mi.name = "execute_action_fold";
+	// 	mi.arguments.push_back(PropertyInfo(Variant::STRING_NAME, "name"));
+	// 	mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p1"));
+	// 	mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p2"));
+	// 	mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p3"));
+	// 	mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p4"));
+	// 	mi.arguments.push_back(PropertyInfo(Variant::VARIANT_MAX, "p5"));
 
-		Vector<Variant> v_arr;
-		v_arr.push_back("");
-		v_arr.push_back(Variant());
-		v_arr.push_back(Variant());
-		v_arr.push_back(Variant());
-		v_arr.push_back(Variant());
-		v_arr.push_back(Variant());
+	// 	Vector<Variant> v_arr;
+	// 	v_arr.push_back("");
+	// 	v_arr.push_back(Variant());
+	// 	v_arr.push_back(Variant());
+	// 	v_arr.push_back(Variant());
+	// 	v_arr.push_back(Variant());
+	// 	v_arr.push_back(Variant());
 
-		ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "execute_action_fold", &EditorActions::execute_action_fold, mi, v_arr, false);
-	}
+	// 	ClassDB::bind_vararg_method(METHOD_FLAGS_DEFAULT, "execute_action_fold", &EditorActions::execute_action_fold, mi, v_arr, false);
+	// }
 
 	// ClassDB::bind_method("clear_execute_cb", &EditorActions::clear_execute_cb);
 }

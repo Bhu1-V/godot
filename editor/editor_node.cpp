@@ -6989,7 +6989,7 @@ EditorNode::EditorNode() {
 	ED_SHORTCUT("editor/editor_3d", TTR("Open 3D Editor"), KEY_MASK_ALT | KEY_2);
 	ED_SHORTCUT("editor/editor_script", TTR("Open Script Editor"), KEY_MASK_ALT | KEY_3);
 	ED_SHORTCUT("editor/editor_assetlib", TTR("Open Asset Library"), KEY_MASK_ALT | KEY_4);
-	ED_SHORTCUT("editor/command_palette", TTR("Open Command Palette"), KEY_MASK_CMD | KEY_MASK_SHIFT | KEY_P);
+	ED_SHORTCUT("editor/command_palette", TTR("Open Command Palette"), KEY_MASK_CMD | KEY_MASK_SHIFT | KEY_A);
 #else
 	// Use the Ctrl modifier so F2 can be used to rename nodes in the scene tree dock.
 	ED_SHORTCUT("editor/editor_2d", TTR("Open 2D Editor"), KEY_MASK_CTRL | KEY_F1);
