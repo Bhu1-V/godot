@@ -3777,6 +3777,7 @@ void EditorNode::register_editor_types() {
 	ClassDB::register_class<EditorSceneImporterMesh>();
 	ClassDB::register_class<EditorSceneImporterMeshNode3D>();
 
+	ClassDB::register_virtual_class<EditorActions>();
 	ClassDB::register_virtual_class<FileSystemDock>();
 
 	// FIXME: Is this stuff obsolete, or should it be ported to new APIs?
@@ -5656,6 +5657,8 @@ EditorNode::EditorNode() {
 	ResourceLoader::clear_path_remaps();
 
 	Input *id = Input::get_singleton();
+
+	editor_actions.instance();
 
 	if (id) {
 		bool found_touchscreen = false;

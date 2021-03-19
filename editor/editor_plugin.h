@@ -34,6 +34,7 @@
 #include "core/io/config_file.h"
 #include "core/object/undo_redo.h"
 #include "editor/debugger/editor_debugger_node.h"
+#include "editor/editor_actions.h"
 #include "editor/editor_inspector.h"
 #include "editor/editor_translation_parser.h"
 #include "editor/import/editor_import_plugin.h"
@@ -46,6 +47,7 @@ class EditorNode;
 class Node3D;
 class Camera3D;
 class EditorSelection;
+class EditorActions;
 class EditorExport;
 class EditorSettings;
 class EditorImportPlugin;
@@ -84,6 +86,8 @@ public:
 	Node *get_edited_scene_root();
 	Array get_open_scenes() const;
 	ScriptEditor *get_script_editor();
+
+	Ref<EditorActions> get_editor_actions();
 
 	void select_file(const String &p_file);
 	String get_selected_path() const;
