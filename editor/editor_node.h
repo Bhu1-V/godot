@@ -50,6 +50,7 @@ class AcceptDialog;
 class AudioStreamPreviewGenerator;
 class BackgroundProgress;
 class CenterContainer;
+class CommandPalette;
 class ConfirmationDialog;
 class Control;
 class DependencyEditor;
@@ -96,6 +97,7 @@ class EditorNode : public Node {
 	GDCLASS(EditorNode, Node);
 
 public:
+	void dummy(int x, int y);
 	enum DockSlot {
 		DOCK_SLOT_LEFT_UL,
 		DOCK_SLOT_LEFT_BL,
@@ -523,6 +525,8 @@ private:
 	bool convert_old;
 
 	void _unhandled_input(const Ref<InputEvent> &p_event);
+
+	void _register_editor_actions();
 
 	static void _load_error_notify(void *p_ud, const String &p_text);
 

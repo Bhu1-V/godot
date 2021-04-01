@@ -37,7 +37,9 @@
 class EditorActions : public Reference {
 	GDCLASS(EditorActions, Reference);
 
-	HashMap<String, Callable> callables;
+	HashMap<String, Pair<Callable, Vector<Variant>>> callables;
+	// HashMap<String, Callable> callables;
+	Vector<String> palette_callables;
 
     // Don't need them for now.
 	// HashMap<StringName, List<Pair<Callable, Array>>> callables_on_executing;
@@ -50,17 +52,22 @@ protected:
 public:
 	EditorActions();
 
-	void add_action(StringName p_name, const Callable &p_callable);
-	void add_action_obj(StringName p_name, const Object *p_object, const StringName &p_method);
+	void _add_action(StringName p_name, const Callable &p_callable, Array arguments);
+	void add_action(StringName p_name, const Callable &p_callable, Vector<Variant> &arguments);
+	void _add_palette_action(StringName p_name, const Callable &p_callable, Array arguments);
+	void add_palette_action(StringName p_name, const Callable &p_callable, Vector<Variant> &arguments);
+
+	// void add_action_obj(StringName p_name, const Object *p_object, const StringName &p_method);
 	void remove_action(StringName p_name);
 
 	void get_action_list(List<String> *p_list) const;
+	const Vector<String>& get_palette_actions_list() const;
 	Callable get_action(StringName p_name);
 
 	// void add_on_action_executing(StringName p_name, const Callable &p_callable, Array params);
 	// void add_on_action_executed(StringName p_name, const Callable &p_callable, Array params);
 
-	void execute_action(StringName action_name, const Variant **params, int p_argcount);
+	void execute_action(StringName action_name);
 	// Variant execute_action_fold(const Variant **p_args, int p_argcount, Callable::CallError &r_error);
 	//Callable get_execute_callable();
 

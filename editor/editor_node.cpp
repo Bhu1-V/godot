@@ -3693,8 +3693,12 @@ void EditorNode::_quick_run() {
 	_run(false, quick_run->get_selected());
 }
 
-void EditorNode::_execute_command(){
-	print_line("execute command");
+void EditorNode::_execute_command() {
+	String selected_command = command_palette->get_selected_command();
+	if(selected_command != "") {
+		EditorNode::get_actions()->execute_action(selected_command);
+		command_palette->set_selected_commmad("");
+	}
 	// todo : execute the action.
 }
 
@@ -5591,6 +5595,25 @@ static void _execute_thread(void *p_ud) {
 	;
 }
 
+void EditorNode::dummy(int x, int y) {
+	if (x == 2 && y == 200)
+	print_line("received correctly");
+	else
+	print_line("error in dummy");
+}
+
+void EditorNode::_register_editor_actions() {
+	print_line("registering actions.");
+	EditorNode::get_actions()->add_palette_action("editor/new_scene", callable_mp(this, &EditorNode::_menu_option_confirm),varray(FILE_NEW_SCENE,true));
+	EditorNode::get_actions()->add_palette_action("editor/inherit_scene", callable_mp(this, &EditorNode::_menu_option_confirm),varray(FILE_NEW_INHERITED_SCENE,true));
+	EditorNode::get_actions()->add_palette_action("editor/open_scene", callable_mp(this, &EditorNode::_menu_option_confirm),varray(FILE_OPEN_SCENE,true));
+	EditorNode::get_actions()->add_palette_action("editor/open_previous_scene", callable_mp(this, &EditorNode::_menu_option_confirm),varray(FILE_OPEN_PREV,true));
+	EditorNode::get_actions()->add_palette_action("editor/save_scene", callable_mp(this, &EditorNode::_menu_option_confirm),varray(FILE_SAVE_SCENE,true));
+	EditorNode::get_actions()->add_palette_action("editor/save_all_scenes", callable_mp(this, &EditorNode::_menu_option_confirm),varray(FILE_SAVE_ALL_SCENES,true));
+	EditorNode::get_actions()->add_palette_action("editor/save_scene_as", callable_mp(this, &EditorNode::_menu_option_confirm),varray(FILE_SAVE_AS_SCENE,true));
+	EditorNode::get_actions()->add_palette_action("dummy/d1", callable_mp(this, &EditorNode::dummy),varray(2,200));
+}
+
 int EditorNode::execute_and_show_output(const String &p_title, const String &p_path, const List<String> &p_arguments, bool p_close_on_ok, bool p_close_on_errors) {
 	execute_output_dialog->set_title(p_title);
 	execute_output_dialog->get_ok_button()->set_disabled(true);
@@ -6400,6 +6423,8 @@ EditorNode::EditorNode() {
 	p->add_separator();
 	p->add_icon_shortcut(gui_base->get_theme_icon("Godot", "EditorIcons"), ED_SHORTCUT("editor/about", TTR("About")), HELP_ABOUT);
 
+	_register_editor_actions();
+
 	HBoxContainer *play_hb = memnew(HBoxContainer);
 	menu_hb->add_child(play_hb);
 
@@ -6925,8 +6950,7 @@ EditorNode::EditorNode() {
 	command_palette->connect("open_resource", callable_mp(this, &EditorNode::_open_resource));
 	command_palette->connect("execute_command", callable_mp(this, &EditorNode::_execute_command));
 
-
-
+	register_editor_types();
 
 	_update_recent_scenes();
 

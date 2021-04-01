@@ -39,6 +39,7 @@ class CommandPalette : public ConfirmationDialog {
 	Tree *search_options;
 	StringName base_type;
 	bool allow_multi_select;
+    String selected_command;
 
     void _text_changed(const String &p_newtext);
     void _update_search();
@@ -46,6 +47,10 @@ class CommandPalette : public ConfirmationDialog {
     void _search_file();
     void _search_action();
 	void _confirmed();
+    void _cleanup();
+    void _sbox_input(const Ref<InputEvent> &p_ie);
+    
+    String get_command_text() const;
 
 protected:
     static void _bind_methods();
@@ -53,5 +58,7 @@ protected:
 public:
     void open_popup();
     CommandPalette();
+    void set_selected_commmad(String);
+    String get_selected_command();
 
 };
