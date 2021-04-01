@@ -41,10 +41,14 @@ void EditorActions::_add_action(StringName p_name, const Callable &p_callable, A
 void EditorActions::add_action(StringName p_name, const Callable &p_callable, Vector<Variant> &arguments) {
 	ERR_FAIL_COND_MSG(callables.has(p_name), "The EditorAction '" + String(p_name) + "' already exists. Unable to add it.");
 
-	Pair<Callable, Vector<Variant>> p_action;
-	p_action.first = p_callable;
-	p_action.second = arguments;
-	callables[p_name] = p_action;
+	// Pair<Callable, Vector<Variant>> p_action;
+	// p_action.first = p_callable;
+	// p_action.second = arguments;
+	const Variant **argptrs = (const Variant **)alloca(sizeof(Variant *) * arguments.size());
+	for (int i = 0; i < arguments.size(); i++) {
+		argptrs[i] = &arguments[i];
+	}
+	callables[p_name] = p_callable.bind(argptrs,arguments.size());
 }
 
 void EditorActions::_add_palette_action(StringName p_name, const Callable &p_callable, Array arguments) {
@@ -82,7 +86,7 @@ void EditorActions::get_action_list(List<String> *p_list) const {
 
 Callable EditorActions::get_action(StringName p_name) {
 	ERR_FAIL_COND_V_MSG(!callables.has(p_name), Callable(), "The EditorAction '" + String(p_name) + "' does not exist. Unable to get it.");
-	return callables[p_name].first;
+	return callables[p_name];
 }
 
 // void EditorActions::add_on_action_executing(StringName p_name, const Callable &p_callable, Array params) {
@@ -114,14 +118,9 @@ void EditorActions::execute_action(StringName action_name) {
 	// 	}
 
 	// calls the function pointer from the callables.
-	Pair<Callable, Vector<Variant>> p_action = callables[action_name];
-	Callable p_callable = p_action.first;
-	const Variant **argptrs = (const Variant **)alloca(sizeof(Variant *) * p_action.second.size());
-	for (int i = 0; i < p_action.second.size(); i++) {
-		argptrs[i] = &p_action.second[i];
-	}
-
-	p_callable.call_deferred(argptrs, p_action.second.size());
+	print_line("executing " + action_name);
+	Callable p_callable = callables[action_name];
+	p_callable.call_deferred(nullptr,0);
 
 	// if (callables_on_executed.has(action_name)) {
 	// 	for (List<Pair<Callable, Array>>::Element *E = callables_on_executed[action_name].front(); E; E = E->next()) {

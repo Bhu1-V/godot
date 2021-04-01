@@ -37,8 +37,8 @@
 class EditorActions : public Reference {
 	GDCLASS(EditorActions, Reference);
 
-	HashMap<String, Pair<Callable, Vector<Variant>>> callables;
-	// HashMap<String, Callable> callables;
+	// HashMap<String, Pair<Callable, Vector<Variant>>> callables;
+	HashMap<String, Callable> callables;
 	Vector<String> palette_callables;
 
     // Don't need them for now.
