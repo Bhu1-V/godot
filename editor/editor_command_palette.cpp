@@ -189,20 +189,28 @@ void EditorCommandPalette::_text_confirmed(const String &p_text) {
 }
 
 void EditorCommandPalette::register_shortcuts_as_command() {
-	for (int i = 0; i < unregisterd_shortcuts.size(); i++) {
-		const String p_shortcut_name = unregisterd_shortcuts[i];
-		ED_SHORTCUT_AS_COMMAND(p_shortcut_name, ED_GET_SHORTCUT(p_shortcut_name));
+	const String *p_command = nullptr;
+	p_command = unregisterd_shortcuts.next(p_command);
+	while (p_command != nullptr) {
+		Ref<Shortcut> p_shortcut = unregisterd_shortcuts[*p_command];
+		Ref<InputEventShortcut> ev;
+		ev.instantiate();
+		ev->set_shortcut(p_shortcut);
+		add_command(*p_command, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
+		p_command = unregisterd_shortcuts.next(p_command);
 	}
 	unregisterd_shortcuts.clear();
 }
 
-Ref<Shortcut> EditorCommandPalette::create_shortcut_and_command(const String &p_path, const String &p_name, uint32_t p_keycode) {
-	Ref<Shortcut> p_shortcut = ED_SHORTCUT(p_path, p_name, p_keycode);
+Ref<Shortcut> EditorCommandPalette::add_shortcut_command(const String &p_command, Ref<Shortcut> p_shortcut) {
 	if (is_inside_tree()) {
-		ED_SHORTCUT_AS_COMMAND(p_name, p_shortcut);
+		Ref<InputEventShortcut> ev;
+		ev.instantiate();
+		ev->set_shortcut(p_shortcut);
+		add_command(p_command, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
 	} else {
-		const String p = String(p_path);
-		unregisterd_shortcuts.push_back(p);
+		const String c_name = String(p_command);
+		unregisterd_shortcuts[c_name] = p_shortcut;
 	}
 	return p_shortcut;
 }
@@ -240,10 +248,8 @@ EditorCommandPalette::EditorCommandPalette() {
 	vbc->add_margin_child(TTR("Matches:"), search_options, true);
 }
 
-Ref<Shortcut> ED_SHORTCUT_AS_COMMAND(String p_command, Ref<Shortcut> p_shortcut) {
-	Ref<InputEventShortcut> ev;
-	ev.instantiate();
-	ev->set_shortcut(p_shortcut);
-	EditorCommandPalette::get_singleton()->add_command(p_command, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
+Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(String p_command, const String &p_path, const String &p_name, uint32_t p_keycode) {
+	Ref<Shortcut> p_shortcut = ED_SHORTCUT(p_path, p_name, p_keycode);
+	EditorCommandPalette::get_singleton()->add_shortcut_command(p_command, p_shortcut);
 	return p_shortcut;
 }

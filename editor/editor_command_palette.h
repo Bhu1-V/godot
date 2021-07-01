@@ -47,7 +47,7 @@ class EditorCommandPalette : public ConfirmationDialog {
 	String selected_command;
 
 	HashMap<String, Callable> callables;
-	Vector<String> unregisterd_shortcuts;
+	HashMap<String, Ref<Shortcut>> unregisterd_shortcuts;
 
 	void _text_changed(const String &p_newtext);
 	void _update_search();
@@ -67,7 +67,7 @@ protected:
 
 public:
 	static EditorCommandPalette *get_singleton();
-	Ref<Shortcut> create_shortcut_and_command(const String &p_path, const String &p_name, uint32_t p_keycode);
+	Ref<Shortcut> add_shortcut_command(const String &p_command, Ref<Shortcut> p_shortcut);
 	void register_shortcuts_as_command();
 	void open_popup();
 	void set_selected_commmad(String);
@@ -77,6 +77,6 @@ public:
 	void execute_command(String p_command_name);
 };
 
-Ref<Shortcut> ED_SHORTCUT_AS_COMMAND(String p_command, Ref<Shortcut> p_shortcut);
+Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(String p_command, const String &p_path, const String &p_name, uint32_t p_keycode = 0);
 
 #endif //EDITOR_COMMAND_PALETTE_H
