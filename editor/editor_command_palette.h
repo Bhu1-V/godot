@@ -46,35 +46,38 @@ class EditorCommandPalette : public ConfirmationDialog {
 	bool allow_multi_select;
 	String selected_command;
 
-	HashMap<String, Callable> callables;
-	HashMap<String, Ref<Shortcut>> unregisterd_shortcuts;
+	struct Command {
+		Callable callable;
+		String name;
+	};
 
-	void _text_changed(const String &p_newtext);
-	void _update_search();
+	HashMap<String, Command> commands;
+	HashMap<String, Pair<String, Ref<Shortcut>>> unregisterd_shortcuts;
+
 	void _update_command_search();
-	void _search_file();
-	void _search_action();
-	void _confirmed();
-	void _cleanup();
+	void _text_changed(const String &p_newtext);
 	void _sbox_input(const Ref<InputEvent> &p_ie);
+	void _cleanup();
+	void _confirmed();
 	void _hide_command_palette();
 	void _text_confirmed(const String &p_text);
+	String _get_command_name(const String &p_key);
 	EditorCommandPalette();
 
 protected:
-	String get_command_text() const;
 	static void _bind_methods();
+	String get_command_text() const;
 
 public:
-	static EditorCommandPalette *get_singleton();
-	Ref<Shortcut> add_shortcut_command(const String &p_command, Ref<Shortcut> p_shortcut);
-	void register_shortcuts_as_command();
-	void open_popup();
-	void set_selected_commmad(String);
 	String get_selected_command();
+	void set_selected_commmad(String);
+	void open_popup();
 	void get_actions_list(List<String> *p_list) const;
-	void add_command(String p_command_name, Callable p_action, Vector<Variant> arguments);
+	void add_command(String p_command_name, String p_key_name, Callable p_action, Vector<Variant> arguments);
 	void execute_command(String p_command_name);
+	void register_shortcuts_as_command();
+	Ref<Shortcut> add_shortcut_command(const String &p_command, const String &p_key, Ref<Shortcut> p_shortcut);
+	static EditorCommandPalette *get_singleton();
 };
 
 Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(String p_command, const String &p_path, const String &p_name, uint32_t p_keycode = 0);

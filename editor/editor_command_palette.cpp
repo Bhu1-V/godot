@@ -35,19 +35,6 @@
 
 EditorCommandPalette *EditorCommandPalette::singleton = nullptr;
 
-void EditorCommandPalette::_update_search() {
-	print_line(command_search_box->get_text());
-}
-
-// String EditorCommandPalette::get_command_text() const {
-// 	const String cmd = command_search_box->get_text();
-// 	if (cmd[0] == '>') {
-// 		return cmd.substr(1, -1);
-// 	} else {
-// 		return cmd;
-// 	}
-// }
-
 void EditorCommandPalette::_update_command_search() {
 	List<String> *actions_list = memnew(List<String>);
 	get_actions_list(actions_list);
@@ -57,14 +44,16 @@ void EditorCommandPalette::_update_command_search() {
 		const bool empty_search = search_text == "";
 
 		// Filter possible candidates.
-		Vector<String> entries;
+		Vector<Pair<String, String>> entries;
 		for (int i = 0; i < actions_list->size(); i++) {
-			String potential_entry = (*actions_list)[i];
-			if (!empty_search && search_text.is_subsequence_ofi(potential_entry)) {
+			String key_name = (*actions_list)[i];
+			String display_name = _get_command_name(key_name);
+			if (!empty_search && search_text.is_subsequence_ofi(display_name)) {
 				// To-do: Rank the Entries....
 				// r.score = empty_search ? 0 : _score_path(search_text, files[i].to_lower());
 				// print_line("found entry : " + (*actions_list)[i]);
-				entries.push_back(potential_entry);
+				Pair entry = Pair(key_name, display_name);
+				entries.push_back(entry);
 			}
 		}
 
@@ -82,7 +71,8 @@ void EditorCommandPalette::_update_command_search() {
 			const int entry_limit = MIN(entries.size(), 300);
 			for (int i = 0; i < entry_limit; i++) {
 				TreeItem *ti = search_options->create_item(root);
-				ti->set_text(0, entries[i]);
+				ti->set_tooltip(0, entries[i].first);
+				ti->set_text(0, entries[i].second);
 				// ti->set_icon(0, *icons.lookup_ptr(entries[i].path.get_extension()));
 			}
 
@@ -130,54 +120,16 @@ void EditorCommandPalette::_cleanup() {
 	print_line("cleaning everything."); //i think this is only for files part but should see.
 }
 
-void EditorCommandPalette::set_selected_commmad(String command) {
-	selected_command = command;
-}
-
-String EditorCommandPalette::get_selected_command() {
-	return selected_command;
-}
-
 void EditorCommandPalette::_confirmed() {
 	TreeItem *selected_option = search_options->get_selected();
 	if (selected_option == nullptr) {
 		print_error("Selected Null");
 		return;
 	}
-	set_selected_commmad(selected_option->get_text(0));
+	set_selected_commmad(selected_option->get_tooltip(0));
 	_cleanup();
 	emit_signal("execute_command");
 	_hide_command_palette(); // window hide.
-}
-
-void EditorCommandPalette::open_popup() {
-	popup_centered_clamped(Size2i(600, 440), 0.8f);
-	command_search_box->clear();
-	command_search_box->grab_focus();
-}
-
-void EditorCommandPalette::get_actions_list(List<String> *p_list) const {
-	callables.get_key_list(p_list);
-}
-
-void EditorCommandPalette::add_command(String p_command_name, Callable p_action, Vector<Variant> arguments) {
-	ERR_FAIL_COND_MSG(callables.has(p_command_name), "The EditorAction '" + String(p_command_name) + "' already exists. Unable to add it.");
-
-	const Variant **argptrs = (const Variant **)alloca(sizeof(Variant *) * arguments.size());
-	for (int i = 0; i < arguments.size(); i++) {
-		argptrs[i] = &arguments[i];
-	}
-	callables[p_command_name] = p_action.bind(argptrs, arguments.size());
-}
-
-void EditorCommandPalette::execute_command(String p_command_name) {
-	if (callables.has(p_command_name)) {
-		print_line("Command: " + p_command_name + " found");
-	} else {
-		print_line(p_command_name + " not found");
-	}
-	Callable p_callable = callables[p_command_name];
-	p_callable.call_deferred(nullptr, 0);
 }
 
 void EditorCommandPalette::_hide_command_palette() {
@@ -188,29 +140,76 @@ void EditorCommandPalette::_text_confirmed(const String &p_text) {
 	_confirmed();
 }
 
+String EditorCommandPalette::_get_command_name(const String &p_key) {
+	return commands[p_key].name;
+}
+
+void EditorCommandPalette::set_selected_commmad(String command) {
+	selected_command = command;
+}
+
+String EditorCommandPalette::get_selected_command() {
+	return selected_command;
+}
+
+void EditorCommandPalette::open_popup() {
+	popup_centered_clamped(Size2i(600, 440), 0.8f);
+	command_search_box->clear();
+	command_search_box->grab_focus();
+}
+
+void EditorCommandPalette::get_actions_list(List<String> *p_list) const {
+	commands.get_key_list(p_list);
+}
+
+void EditorCommandPalette::add_command(String p_command_name, String p_key_name, Callable p_action, Vector<Variant> arguments) {
+	ERR_FAIL_COND_MSG(commands.has(p_key_name), "The EditorAction '" + String(p_command_name) + "' already exists. Unable to add it.");
+
+	const Variant **argptrs = (const Variant **)alloca(sizeof(Variant *) * arguments.size());
+	for (int i = 0; i < arguments.size(); i++) {
+		argptrs[i] = &arguments[i];
+	}
+	Command p_command;
+	p_command.name = p_command_name;
+	p_command.callable = p_action.bind(argptrs, arguments.size());
+
+	commands[p_key_name] = p_command;
+}
+
+void EditorCommandPalette::execute_command(String p_command_name) {
+	if (commands.has(p_command_name)) {
+		print_line("Command: " + p_command_name + " found");
+	} else {
+		print_line(p_command_name + " not found");
+	}
+	commands[p_command_name].callable.call_deferred(nullptr, 0);
+}
 void EditorCommandPalette::register_shortcuts_as_command() {
-	const String *p_command = nullptr;
-	p_command = unregisterd_shortcuts.next(p_command);
-	while (p_command != nullptr) {
-		Ref<Shortcut> p_shortcut = unregisterd_shortcuts[*p_command];
+	const String *p_key = nullptr;
+	p_key = unregisterd_shortcuts.next(p_key);
+	while (p_key != nullptr) {
+		String command_name = unregisterd_shortcuts[*p_key].first;
+		Ref<Shortcut> p_shortcut = unregisterd_shortcuts[*p_key].second;
 		Ref<InputEventShortcut> ev;
 		ev.instantiate();
 		ev->set_shortcut(p_shortcut);
-		add_command(*p_command, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
-		p_command = unregisterd_shortcuts.next(p_command);
+		add_command(command_name, *p_key, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
+		p_key = unregisterd_shortcuts.next(p_key);
 	}
 	unregisterd_shortcuts.clear();
 }
 
-Ref<Shortcut> EditorCommandPalette::add_shortcut_command(const String &p_command, Ref<Shortcut> p_shortcut) {
+Ref<Shortcut> EditorCommandPalette::add_shortcut_command(const String &p_command, const String &p_key, Ref<Shortcut> p_shortcut) {
 	if (is_inside_tree()) {
 		Ref<InputEventShortcut> ev;
 		ev.instantiate();
 		ev->set_shortcut(p_shortcut);
-		add_command(p_command, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
+		add_command(p_command, p_key, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
 	} else {
-		const String c_name = String(p_command);
-		unregisterd_shortcuts[c_name] = p_shortcut;
+		const String command_name = String(p_command);
+		const String key_name = String(p_key);
+		Pair p_pair = Pair(command_name, p_shortcut);
+		unregisterd_shortcuts[key_name] = p_pair;
 	}
 	return p_shortcut;
 }
@@ -250,6 +249,6 @@ EditorCommandPalette::EditorCommandPalette() {
 
 Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(String p_command, const String &p_path, const String &p_name, uint32_t p_keycode) {
 	Ref<Shortcut> p_shortcut = ED_SHORTCUT(p_path, p_name, p_keycode);
-	EditorCommandPalette::get_singleton()->add_shortcut_command(p_command, p_shortcut);
+	EditorCommandPalette::get_singleton()->add_shortcut_command(p_command, p_path, p_shortcut);
 	return p_shortcut;
 }

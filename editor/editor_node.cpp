@@ -6212,24 +6212,24 @@ EditorNode::EditorNode() {
 
 	p = file_menu->get_popup();
 
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("new scene", "editor/new_scene", TTR("New Scene"), KEY_MASK_CMD + KEY_N),
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("New Scene"), "editor/new_scene", TTR("New Scene"), KEY_MASK_CMD + KEY_N),
 			FILE_NEW_SCENE);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("new inherited scene", "editor/new_inherited_scene", TTR("New Inherited Scene..."), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_N), FILE_NEW_INHERITED_SCENE);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("open scene", "editor/open_scene", TTR("Open Scene..."), KEY_MASK_CMD + KEY_O),
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("New Inherited Scene"), "editor/new_inherited_scene", TTR("New Inherited Scene..."), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_N), FILE_NEW_INHERITED_SCENE);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Open Scene"), "editor/open_scene", TTR("Open Scene..."), KEY_MASK_CMD + KEY_O),
 			FILE_OPEN_SCENE);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("reopen closed scence", "editor/reopen_closed_scene", TTR("Reopen Closed Scene"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_T), FILE_OPEN_PREV);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Reopen Closed Scence"), "editor/reopen_closed_scene", TTR("Reopen Closed Scene"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_T), FILE_OPEN_PREV);
 	p->add_submenu_item(TTR("Open Recent"), "RecentScenes", FILE_OPEN_RECENT);
 
 	p->add_separator();
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("save scene", "editor/save_scene", TTR("Save Scene"), KEY_MASK_CMD + KEY_S), FILE_SAVE_SCENE);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("save scene as", "editor/save_scene_as", TTR("Save Scene As..."), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_S), FILE_SAVE_AS_SCENE);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("save all scenes", "editor/save_all_scenes", TTR("Save All Scenes"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_MASK_ALT + KEY_S), FILE_SAVE_ALL_SCENES);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Save Scene"), "editor/save_scene", TTR("Save Scene"), KEY_MASK_CMD + KEY_S), FILE_SAVE_SCENE);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Save Scene As"), "editor/save_scene_as", TTR("Save Scene As..."), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_S), FILE_SAVE_AS_SCENE);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Save All Scenes"), "editor/save_all_scenes", TTR("Save All Scenes"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_MASK_ALT + KEY_S), FILE_SAVE_ALL_SCENES);
 
 	p->add_separator();
 
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("quick open", "editor/quick_open", TTR("Quick Open..."), KEY_MASK_SHIFT + KEY_MASK_ALT + KEY_O), FILE_QUICK_OPEN);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("quick open scene", "editor/quick_open_scene", TTR("Quick Open Scene..."), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_O), FILE_QUICK_OPEN_SCENE);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("quick open script", "editor/quick_open_script", TTR("Quick Open Script..."), KEY_MASK_CMD + KEY_MASK_ALT + KEY_O), FILE_QUICK_OPEN_SCRIPT);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Quick Open"), "editor/quick_open", TTR("Quick Open..."), KEY_MASK_SHIFT + KEY_MASK_ALT + KEY_O), FILE_QUICK_OPEN);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Quick Open Scene"), "editor/quick_open_scene", TTR("Quick Open Scene..."), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_O), FILE_QUICK_OPEN_SCENE);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Quick Open Script"), "editor/quick_open_script", TTR("Quick Open Script..."), KEY_MASK_CMD + KEY_MASK_ALT + KEY_O), FILE_QUICK_OPEN_SCRIPT);
 
 	p->add_separator();
 	PopupMenu *pm_export = memnew(PopupMenu);
@@ -6244,8 +6244,8 @@ EditorNode::EditorNode() {
 	p->add_shortcut(ED_GET_SHORTCUT("ui_redo"), EDIT_REDO, true);
 
 	p->add_separator();
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("reload saved scene", "editor/reload_saved_scene", TTR("Reload Saved Scene")), EDIT_RELOAD_SAVED_SCENE);
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("close scene", "editor/close_scene", TTR("Close Scene"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_W), FILE_CLOSE);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Reload Saved Scene"), "editor/reload_saved_scene", TTR("Reload Saved Scene")), EDIT_RELOAD_SAVED_SCENE);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Close Scene"), "editor/close_scene", TTR("Close Scene"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_W), FILE_CLOSE);
 
 	recent_scenes = memnew(PopupMenu);
 	recent_scenes->set_name("RecentScenes");
@@ -6253,7 +6253,7 @@ EditorNode::EditorNode() {
 	recent_scenes->connect("id_pressed", callable_mp(this, &EditorNode::_open_recent_scene));
 
 	p->add_separator();
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("file quit", "editor/file_quit", TTR("Quit"), KEY_MASK_CMD + KEY_Q), FILE_QUIT, true);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("File Quit"), "editor/file_quit", TTR("Quit"), KEY_MASK_CMD + KEY_Q), FILE_QUIT, true);
 
 	project_menu = memnew(MenuButton);
 	project_menu->set_flat(false);
@@ -6265,7 +6265,7 @@ EditorNode::EditorNode() {
 
 	p = project_menu->get_popup();
 
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("project settings", "editor/project_settings", TTR("Project Settings...")), RUN_SETTINGS);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Project Settings"), "editor/project_settings", TTR("Project Settings...")), RUN_SETTINGS);
 	p->connect("id_pressed", callable_mp(this, &EditorNode::_menu_option));
 
 	vcs_actions_menu = VersionControlEditorPlugin::get_singleton()->get_version_control_actions_panel();
@@ -6278,7 +6278,7 @@ EditorNode::EditorNode() {
 	vcs_actions_menu->add_item(TTR("Shut Down Version Control"), RUN_VCS_SHUT_DOWN);
 
 	p->add_separator();
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("export", "editor/export", TTR("Export...")), FILE_EXPORT_PROJECT);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Export"), "editor/export", TTR("Export...")), FILE_EXPORT_PROJECT);
 	p->add_item(TTR("Install Android Build Template..."), FILE_INSTALL_ANDROID_SOURCE);
 	p->add_item(TTR("Open Project Data Folder"), RUN_PROJECT_DATA_FOLDER);
 
@@ -6296,9 +6296,9 @@ EditorNode::EditorNode() {
 	p->add_separator();
 	p->add_item(TTR("Reload Current Project"), RUN_RELOAD_CURRENT_PROJECT);
 #ifdef OSX_ENABLED
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("quit to project list", "editor/quit_to_project_list", TTR("Quit to Project List"), KEY_MASK_SHIFT + KEY_MASK_ALT + KEY_Q), RUN_PROJECT_MANAGER, true);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Quit to Project List"), "editor/quit_to_project_list", TTR("Quit to Project List"), KEY_MASK_SHIFT + KEY_MASK_ALT + KEY_Q), RUN_PROJECT_MANAGER, true);
 #else
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("quit to project list", "editor/quit_to_project_list", TTR("Quit to Project List"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_Q), RUN_PROJECT_MANAGER, true);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Quit to Project List"), "editor/quit_to_project_list", TTR("Quit to Project List"), KEY_MASK_CMD + KEY_MASK_SHIFT + KEY_Q), RUN_PROJECT_MANAGER, true);
 #endif
 
 	menu_hb->add_spacer();
@@ -6325,9 +6325,9 @@ EditorNode::EditorNode() {
 
 	p = settings_menu->get_popup();
 #ifdef OSX_ENABLED
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("editor settings", "editor/editor_settings", TTR("Editor Settings..."), KEY_MASK_CMD + KEY_COMMA), SETTINGS_PREFERENCES);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Editor Settings"), "editor/editor_settings", TTR("Editor Settings..."), KEY_MASK_CMD + KEY_COMMA), SETTINGS_PREFERENCES);
 #else
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("editor settings", "editor/editor_settings", TTR("Editor Settings...")), SETTINGS_PREFERENCES);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Editor Settings"), "editor/editor_settings", TTR("Editor Settings...")), SETTINGS_PREFERENCES);
 #endif
 	p->add_separator();
 
@@ -6338,15 +6338,15 @@ EditorNode::EditorNode() {
 	p->add_submenu_item(TTR("Editor Layout"), "Layouts");
 	p->add_separator();
 #ifdef OSX_ENABLED
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("take screenshot", "editor/take_screenshot", TTR("Take Screenshot"), KEY_MASK_CMD | KEY_F12), EDITOR_SCREENSHOT);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Take Screenshot"), "editor/take_screenshot", TTR("Take Screenshot"), KEY_MASK_CMD | KEY_F12), EDITOR_SCREENSHOT);
 #else
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("take screenshot", "editor/take_screenshot", TTR("Take Screenshot"), KEY_MASK_CTRL | KEY_F12), EDITOR_SCREENSHOT);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Take Screenshot"), "editor/take_screenshot", TTR("Take Screenshot"), KEY_MASK_CTRL | KEY_F12), EDITOR_SCREENSHOT);
 #endif
 	p->set_item_tooltip(p->get_item_count() - 1, TTR("Screenshots are stored in the Editor Data/Settings Folder."));
 #ifdef OSX_ENABLED
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("fullscreen mode", "editor/fullscreen_mode", TTR("Toggle Fullscreen"), KEY_MASK_CMD | KEY_MASK_CTRL | KEY_F), SETTINGS_TOGGLE_FULLSCREEN);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Fullscreen Mode"), "editor/fullscreen_mode", TTR("Toggle Fullscreen"), KEY_MASK_CMD | KEY_MASK_CTRL | KEY_F), SETTINGS_TOGGLE_FULLSCREEN);
 #else
-	p->add_shortcut(ED_SHORTCUT_AND_COMMAND("fullscreen mode", "editor/fullscreen_mode", TTR("Toggle Fullscreen"), KEY_MASK_SHIFT | KEY_F11), SETTINGS_TOGGLE_FULLSCREEN);
+	p->add_shortcut(ED_SHORTCUT_AND_COMMAND(TTR("Fullscreen Mode"), "editor/fullscreen_mode", TTR("Toggle Fullscreen"), KEY_MASK_SHIFT | KEY_F11), SETTINGS_TOGGLE_FULLSCREEN);
 #endif
 #if defined(WINDOWS_ENABLED) && defined(WINDOWS_SUBSYSTEM_CONSOLE)
 	// The console can only be toggled if the application was built for the console subsystem,
@@ -6379,19 +6379,19 @@ EditorNode::EditorNode() {
 	p = help_menu->get_popup();
 	p->connect("id_pressed", callable_mp(this, &EditorNode::_menu_option));
 #ifdef OSX_ENABLED
-	p->add_icon_shortcut(gui_base->get_theme_icon("HelpSearch", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("editor help", "editor/editor_help", TTR("Search Help"), KEY_MASK_ALT | KEY_SPACE), HELP_SEARCH);
+	p->add_icon_shortcut(gui_base->get_theme_icon("HelpSearch", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Editor Help"), "editor/editor_help", TTR("Search Help"), KEY_MASK_ALT | KEY_SPACE), HELP_SEARCH);
 #else
-	p->add_icon_shortcut(gui_base->get_theme_icon("HelpSearch", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("editor help", "editor/editor_help", TTR("Search Help"), KEY_F1), HELP_SEARCH);
+	p->add_icon_shortcut(gui_base->get_theme_icon("HelpSearch", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Editor Help"), "editor/editor_help", TTR("Search Help"), KEY_F1), HELP_SEARCH);
 #endif
 	p->add_separator();
-	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("online docs", "editor/online_docs", TTR("Online Documentation")), HELP_DOCS);
-	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("q&a", "editor/q&a", TTR("Questions & Answers")), HELP_QA);
-	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("report a bug", "editor/report_a_bug", TTR("Report a Bug")), HELP_REPORT_A_BUG);
-	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("send docs feedback", "editor/send_docs_feedback", TTR("Send Docs Feedback")), HELP_SEND_DOCS_FEEDBACK);
-	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("community", "editor/community", TTR("Community")), HELP_COMMUNITY);
+	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Online documentation"), "editor/online_docs", TTR("Online Documentation")), HELP_DOCS);
+	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Question & Answers"), "editor/q&a", TTR("Questions & Answers")), HELP_QA);
+	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Report a Bug"), "editor/report_a_bug", TTR("Report a Bug")), HELP_REPORT_A_BUG);
+	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Send Docs Feedback"), "editor/send_docs_feedback", TTR("Send Docs Feedback")), HELP_SEND_DOCS_FEEDBACK);
+	p->add_icon_shortcut(gui_base->get_theme_icon("Instance", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Community"), "editor/community", TTR("Community")), HELP_COMMUNITY);
 	p->add_separator();
-	p->add_icon_shortcut(gui_base->get_theme_icon("Godot", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("about", "editor/about", TTR("About Godot")), HELP_ABOUT);
-	p->add_icon_shortcut(gui_base->get_theme_icon("Heart", "EditorIcons"), ED_SHORTCUT_AND_COMMAND("support development", "editor/support_development", TTR("Support Godot Development")), HELP_SUPPORT_GODOT_DEVELOPMENT);
+	p->add_icon_shortcut(gui_base->get_theme_icon("Godot", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("About"), "editor/about", TTR("About Godot")), HELP_ABOUT);
+	p->add_icon_shortcut(gui_base->get_theme_icon("Heart", "EditorIcons"), ED_SHORTCUT_AND_COMMAND(TTR("Support Development"), "editor/support_development", TTR("Support Godot Development")), HELP_SUPPORT_GODOT_DEVELOPMENT);
 
 	HBoxContainer *play_hb = memnew(HBoxContainer);
 	menu_hb->add_child(play_hb);
