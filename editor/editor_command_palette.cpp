@@ -55,55 +55,53 @@ float EditorCommandPalette::_score_path(const String &p_search, const String &p_
 }
 
 void EditorCommandPalette::_update_command_search() {
-	commands.get_key_list(command_keys);
+	commands.get_key_list(&command_keys);
+	ERR_FAIL_COND(command_keys.is_empty());
 
-	if (command_keys != nullptr) {
-		const String search_text = command_search_box->get_text();
-		const bool empty_search = search_text.is_empty();
 
-		// Filter possible candidates.
-		Vector<CommandEntry> entries;
-		for (int i = 0; i < command_keys->size(); i++) {
-			CommandEntry r;
-			r.key_name = (*command_keys)[i];
-			r.display_name = commands[r.key_name].name;
-			if (!empty_search && search_text.is_subsequence_ofi(r.display_name)) {
-				r.score = empty_search ? 0 : _score_path(search_text, r.display_name.to_lower());
-				entries.push_back(r);
-			}
+	const String search_text = command_search_box->get_text();
+	const bool empty_search = search_text.is_empty();
+
+	// Filter possible candidates.
+	Vector<CommandEntry> entries;
+	for (int i = 0; i < command_keys.size(); i++) {
+		CommandEntry r;
+		r.key_name = command_keys[i];
+		r.display_name = commands[r.key_name].name;
+		if (!empty_search && search_text.is_subsequence_ofi(r.display_name)) {
+			r.score = empty_search ? 0 : _score_path(search_text, r.display_name.to_lower());
+			entries.push_back(r);
+		}
+	}
+
+	command_keys.clear();
+
+	TreeItem *root = search_options->get_root();
+	root->clear_children();
+
+	if (entries.size() > 0) {
+		if (!empty_search) {
+			SortArray<CommandEntry, CommandEntryComparator> sorter;
+			sorter.sort(entries.ptrw(), entries.size());
 		}
 
-		command_keys->clear();
-
-		TreeItem *root = search_options->get_root();
-		root->clear_children();
-
-		if (entries.size() > 0) {
-			if (!empty_search) {
-				SortArray<CommandEntry, CommandEntryComparator> sorter;
-				sorter.sort(entries.ptrw(), entries.size());
-			}
-
-			const int entry_limit = MIN(entries.size(), 300);
-			for (int i = 0; i < entry_limit; i++) {
-				TreeItem *ti = search_options->create_item(root);
-				ti->set_tooltip(0, entries[i].key_name);
-				ti->set_text(0, entries[i].display_name);
-			}
-
-			TreeItem *to_select = root->get_first_child();
-			to_select->select(0);
-			to_select->set_as_cursor(0);
-			search_options->scroll_to_item(to_select);
-
-			get_ok_button()->set_disabled(false);
-		} else {
-			search_options->deselect_all();
-
-			get_ok_button()->set_disabled(true);
+		const int entry_limit = MIN(entries.size(), 300);
+		for (int i = 0; i < entry_limit; i++) {
+			TreeItem *ti = search_options->create_item(root);
+			ti->set_tooltip(0, entries[i].key_name);
+			ti->set_text(0, entries[i].display_name);
 		}
+
+		TreeItem *to_select = root->get_first_child();
+		to_select->select(0);
+		to_select->set_as_cursor(0);
+		search_options->scroll_to_item(to_select);
+
+		get_ok_button()->set_disabled(false);
 	} else {
-		ERR_FAIL_COND(!command_keys);
+		search_options->deselect_all();
+
+		get_ok_button()->set_disabled(true);
 	}
 }
 
@@ -231,12 +229,10 @@ EditorCommandPalette::EditorCommandPalette() {
 	search_options->set_hide_folding(true);
 	search_options->add_theme_constant_override("draw_guides", 1);
 	vbc->add_margin_child(TTR("Matches:"), search_options, true);
-
-	command_keys = memnew(List<String>);
 }
 
 Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(const String &p_path, const String &p_name, uint32_t p_keycode, String p_command_name) {
-	if (p_command_name == "") {
+	if (p_command_name.is_empty()) {
 		p_command_name = p_name;
 	}
 

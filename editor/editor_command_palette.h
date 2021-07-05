@@ -45,7 +45,7 @@ class EditorCommandPalette : public ConfirmationDialog {
 	StringName base_type;
 	bool allow_multi_select;
 	String selected_command;
-	List<String> *command_keys;
+	List<String> command_keys;
 
 	struct Command {
 		Callable callable;

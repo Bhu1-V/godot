@@ -3699,13 +3699,9 @@ void EditorNode::_quick_run() {
 
 void EditorNode::_execute_command() {
 	String selected_command = command_palette->get_selected_command();
-	if (selected_command != "") {
-		command_palette->execute_command(selected_command);
-		command_palette->set_selected_commmad("");
-	} else {
-		print_error("\ngot nothing to execute\n");
-	}
-	// todo : execute the action.
+	ERR_FAIL_COND(selected_command.is_empty());
+	command_palette->execute_command(selected_command);
+	command_palette->set_selected_commmad("");
 }
 
 void EditorNode::notify_all_debug_sessions_exited() {
@@ -5666,8 +5662,6 @@ EditorNode::EditorNode() {
 	ResourceLoader::clear_path_remaps();
 
 	Input *id = Input::get_singleton();
-
-	// editor_actions.instance();
 
 	if (id) {
 		bool found_touchscreen = false;
