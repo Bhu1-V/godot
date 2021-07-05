@@ -55,26 +55,25 @@ float EditorCommandPalette::_score_path(const String &p_search, const String &p_
 }
 
 void EditorCommandPalette::_update_command_search() {
-	List<String> *actions_list = memnew(List<String>);
-	get_actions_list(actions_list);
+	commands.get_key_list(command_keys);
 
-	if (actions_list != nullptr) {
+	if (command_keys != nullptr) {
 		const String search_text = command_search_box->get_text();
-		const bool empty_search = search_text == "";
+		const bool empty_search = search_text.is_empty();
 
 		// Filter possible candidates.
 		Vector<CommandEntry> entries;
-		for (int i = 0; i < actions_list->size(); i++) {
+		for (int i = 0; i < command_keys->size(); i++) {
 			CommandEntry r;
-			r.key_name = (*actions_list)[i];
-			r.display_name = _get_command_name(r.key_name);
+			r.key_name = (*command_keys)[i];
+			r.display_name = commands[r.key_name].name;
 			if (!empty_search && search_text.is_subsequence_ofi(r.display_name)) {
 				r.score = empty_search ? 0 : _score_path(search_text, r.display_name.to_lower());
 				entries.push_back(r);
 			}
 		}
 
-		actions_list->clear();
+		command_keys->clear();
 
 		TreeItem *root = search_options->get_root();
 		root->clear_children();
@@ -91,7 +90,6 @@ void EditorCommandPalette::_update_command_search() {
 				ti->set_tooltip(0, entries[i].key_name);
 				ti->set_text(0, entries[i].display_name);
 			}
-			
 
 			TreeItem *to_select = root->get_first_child();
 			to_select->select(0);
@@ -105,12 +103,8 @@ void EditorCommandPalette::_update_command_search() {
 			get_ok_button()->set_disabled(true);
 		}
 	} else {
-		print_error("Failed to fetch action_list.");
+		ERR_FAIL_COND(!command_keys);
 	}
-}
-
-void EditorCommandPalette::_text_changed(const String &p_newtext) {
-	_update_command_search();
 }
 
 void EditorCommandPalette::_bind_methods() {
@@ -133,32 +127,11 @@ void EditorCommandPalette::_sbox_input(const Ref<InputEvent> &p_ie) {
 	}
 }
 
-void EditorCommandPalette::_cleanup() {
-	print_line("cleaning everything."); //i think this is only for files part but should see.
-}
-
 void EditorCommandPalette::_confirmed() {
 	TreeItem *selected_option = search_options->get_selected();
-	if (selected_option == nullptr) {
-		print_error("Selected Null");
-		return;
-	}
 	set_selected_commmad(selected_option->get_tooltip(0));
-	_cleanup();
 	emit_signal("execute_command");
-	_hide_command_palette(); // window hide.
-}
-
-void EditorCommandPalette::_hide_command_palette() {
 	hide();
-}
-
-void EditorCommandPalette::_text_confirmed(const String &p_text) {
-	_confirmed();
-}
-
-String EditorCommandPalette::_get_command_name(const String &p_key) {
-	return commands[p_key].name;
 }
 
 void EditorCommandPalette::set_selected_commmad(String command) {
@@ -194,11 +167,7 @@ void EditorCommandPalette::add_command(String p_command_name, String p_key_name,
 }
 
 void EditorCommandPalette::execute_command(String p_command_name) {
-	if (commands.has(p_command_name)) {
-		print_line("Command: " + p_command_name + " found");
-	} else {
-		print_line(p_command_name + " not found");
-	}
+	ERR_FAIL_COND_MSG(!commands.has(p_command_name), p_command_name + " not found.");
 	commands[p_command_name].callable.call_deferred(nullptr, 0);
 }
 
@@ -243,16 +212,15 @@ EditorCommandPalette::EditorCommandPalette() {
 	allow_multi_select = false;
 
 	VBoxContainer *vbc = memnew(VBoxContainer);
-	vbc->connect("focus_exited", callable_mp(this, &EditorCommandPalette::_hide_command_palette));
-	// todo: add theme change signaal handler
+	// todo: add theme change signal handler
 	add_child(vbc);
 
 	command_search_box = memnew(LineEdit);
 	command_search_box->set_placeholder("search for a command");
 	command_search_box->set_placeholder_alpha(0.5);
-	command_search_box->connect("text_changed", callable_mp(this, &EditorCommandPalette::_text_changed));
 	command_search_box->connect("gui_input", callable_mp(this, &EditorCommandPalette::_sbox_input));
-	command_search_box->connect("text_submitted", callable_mp(this, &EditorCommandPalette::_text_confirmed));
+	command_search_box->connect("text_changed", callable_mp(this, &EditorCommandPalette::_update_command_search).unbind(1));
+	command_search_box->connect("text_submitted", callable_mp(this, &EditorCommandPalette::_confirmed).unbind(1));
 	vbc->add_margin_child(TTR("Search:"), command_search_box);
 	register_text_enter(command_search_box);
 
@@ -263,10 +231,16 @@ EditorCommandPalette::EditorCommandPalette() {
 	search_options->set_hide_folding(true);
 	search_options->add_theme_constant_override("draw_guides", 1);
 	vbc->add_margin_child(TTR("Matches:"), search_options, true);
+
+	command_keys = memnew(List<String>);
 }
 
-Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(String p_command, const String &p_path, const String &p_name, uint32_t p_keycode) {
+Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(const String &p_path, const String &p_name, uint32_t p_keycode, String p_command_name) {
+	if (p_command_name == "") {
+		p_command_name = p_name;
+	}
+
 	Ref<Shortcut> p_shortcut = ED_SHORTCUT(p_path, p_name, p_keycode);
-	EditorCommandPalette::get_singleton()->add_shortcut_command(p_command, p_path, p_shortcut);
+	EditorCommandPalette::get_singleton()->add_shortcut_command(p_command_name, p_path, p_shortcut);
 	return p_shortcut;
 }

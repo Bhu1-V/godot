@@ -45,6 +45,7 @@ class EditorCommandPalette : public ConfirmationDialog {
 	StringName base_type;
 	bool allow_multi_select;
 	String selected_command;
+	List<String> *command_keys;
 
 	struct Command {
 		Callable callable;
@@ -68,13 +69,9 @@ class EditorCommandPalette : public ConfirmationDialog {
 
 	void _update_command_search();
 	float _score_path(const String &p_search, const String &p_path);
-	void _text_changed(const String &p_newtext);
 	void _sbox_input(const Ref<InputEvent> &p_ie);
-	void _cleanup();
 	void _confirmed();
-	void _hide_command_palette();
-	void _text_confirmed(const String &p_text);
-	String _get_command_name(const String &p_key);
+	void _update_command_keys();
 	EditorCommandPalette();
 
 protected:
@@ -93,6 +90,6 @@ public:
 	static EditorCommandPalette *get_singleton();
 };
 
-Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(String p_command, const String &p_path, const String &p_name, uint32_t p_keycode = 0);
+Ref<Shortcut> ED_SHORTCUT_AND_COMMAND(const String &p_path, const String &p_name, uint32_t p_keycode = 0, String p_command = "");
 
 #endif //EDITOR_COMMAND_PALETTE_H
