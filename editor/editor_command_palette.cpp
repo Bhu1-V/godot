@@ -35,6 +35,25 @@
 
 EditorCommandPalette *EditorCommandPalette::singleton = nullptr;
 
+float EditorCommandPalette::_score_path(const String &p_search, const String &p_path) {
+	float score = 0.9f + .1f * (p_search.length() / (float)p_path.length());
+
+	// Positive bias for matches close to the beginning of the file name.
+	int pos = p_path.findn(p_search);
+	if (pos != -1) {
+		return score * (1.0f - 0.1f * (float(pos) / p_path.length()));
+	}
+
+	// Positive bias for matches close to the end of the path.
+	pos = p_path.rfindn(p_search);
+	if (pos != -1) {
+		return score * (0.8f - 0.1f * (float(p_path.length() - pos) / p_path.length()));
+	}
+
+	// Remaining results belong to the same class of results.
+	return score * 0.69f;
+}
+
 void EditorCommandPalette::_update_command_search() {
 	List<String> *actions_list = memnew(List<String>);
 	get_actions_list(actions_list);
@@ -44,16 +63,14 @@ void EditorCommandPalette::_update_command_search() {
 		const bool empty_search = search_text == "";
 
 		// Filter possible candidates.
-		Vector<Pair<String, String>> entries;
+		Vector<CommandEntry> entries;
 		for (int i = 0; i < actions_list->size(); i++) {
-			String key_name = (*actions_list)[i];
-			String display_name = _get_command_name(key_name);
-			if (!empty_search && search_text.is_subsequence_ofi(display_name)) {
-				// To-do: Rank the Entries....
-				// r.score = empty_search ? 0 : _score_path(search_text, files[i].to_lower());
-				// print_line("found entry : " + (*actions_list)[i]);
-				Pair entry = Pair(key_name, display_name);
-				entries.push_back(entry);
+			CommandEntry r;
+			r.key_name = (*actions_list)[i];
+			r.display_name = _get_command_name(r.key_name);
+			if (!empty_search && search_text.is_subsequence_ofi(r.display_name)) {
+				r.score = empty_search ? 0 : _score_path(search_text, r.display_name.to_lower());
+				entries.push_back(r);
 			}
 		}
 
@@ -63,18 +80,18 @@ void EditorCommandPalette::_update_command_search() {
 		root->clear_children();
 
 		if (entries.size() > 0) {
-			// if (!empty_search) {
-			// 	SortArray<Entry, EntryComparator> sorter;
-			// 	sorter.sort(entries.ptrw(), entries.size());
-			// }
+			if (!empty_search) {
+				SortArray<CommandEntry, CommandEntryComparator> sorter;
+				sorter.sort(entries.ptrw(), entries.size());
+			}
 
 			const int entry_limit = MIN(entries.size(), 300);
 			for (int i = 0; i < entry_limit; i++) {
 				TreeItem *ti = search_options->create_item(root);
-				ti->set_tooltip(0, entries[i].first);
-				ti->set_text(0, entries[i].second);
-				// ti->set_icon(0, *icons.lookup_ptr(entries[i].path.get_extension()));
+				ti->set_tooltip(0, entries[i].key_name);
+				ti->set_text(0, entries[i].display_name);
 			}
+			
 
 			TreeItem *to_select = root->get_first_child();
 			to_select->select(0);
@@ -184,6 +201,7 @@ void EditorCommandPalette::execute_command(String p_command_name) {
 	}
 	commands[p_command_name].callable.call_deferred(nullptr, 0);
 }
+
 void EditorCommandPalette::register_shortcuts_as_command() {
 	const String *p_key = nullptr;
 	p_key = unregisterd_shortcuts.next(p_key);

@@ -51,10 +51,23 @@ class EditorCommandPalette : public ConfirmationDialog {
 		String name;
 	};
 
+	struct CommandEntry {
+		String key_name;
+		String display_name;
+		float score;
+	};
+
+	struct CommandEntryComparator {
+		_FORCE_INLINE_ bool operator()(const CommandEntry &A, const CommandEntry &B) const {
+			return A.score > B.score;
+		}
+	};
+
 	HashMap<String, Command> commands;
 	HashMap<String, Pair<String, Ref<Shortcut>>> unregisterd_shortcuts;
 
 	void _update_command_search();
+	float _score_path(const String &p_search, const String &p_path);
 	void _text_changed(const String &p_newtext);
 	void _sbox_input(const Ref<InputEvent> &p_ie);
 	void _cleanup();
