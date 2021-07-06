@@ -43,9 +43,6 @@ class EditorCommandPalette : public ConfirmationDialog {
 	LineEdit *command_search_box;
 	Tree *search_options;
 	StringName base_type;
-	bool allow_multi_select;
-	String selected_command;
-	List<String> command_keys;
 
 	struct Command {
 		Callable callable;
@@ -67,11 +64,14 @@ class EditorCommandPalette : public ConfirmationDialog {
 	HashMap<String, Command> commands;
 	HashMap<String, Pair<String, Ref<Shortcut>>> unregisterd_shortcuts;
 
-	void _update_command_search();
+	List<String> command_keys;
+
+	void _update_command_search(const String &search_text);
 	float _score_path(const String &p_search, const String &p_path);
 	void _sbox_input(const Ref<InputEvent> &p_ie);
 	void _confirmed();
 	void _update_command_keys();
+	void _theme_changed();
 	EditorCommandPalette();
 
 protected:
@@ -79,8 +79,6 @@ protected:
 	String get_command_text() const;
 
 public:
-	String get_selected_command();
-	void set_selected_commmad(String);
 	void open_popup();
 	void get_actions_list(List<String> *p_list) const;
 	void add_command(String p_command_name, String p_key_name, Callable p_action, Vector<Variant> arguments);

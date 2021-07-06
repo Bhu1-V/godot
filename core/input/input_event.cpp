@@ -1499,7 +1499,6 @@ void InputEventMIDI::_bind_methods() {
 ///////////////////////////////////
 
 void InputEventShortcut::set_shortcut(Ref<Shortcut> p_shortcut) {
-	ERR_FAIL_COND(Object::cast_to<InputEventShortcut>(*p_shortcut) != nullptr);
 	shortcut = p_shortcut;
 	emit_changed();
 }

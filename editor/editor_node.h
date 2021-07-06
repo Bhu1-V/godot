@@ -445,8 +445,6 @@ private:
 	List<String> previous_scenes;
 	bool opening_prev;
 
-	EditorCommandPalette *editor_command_palette;
-
 	void _dialog_action(String p_file);
 
 	void _edit_current();
@@ -504,7 +502,6 @@ private:
 
 	void _quick_opened();
 	void _quick_run();
-	void _execute_command();
 	void _open_command_palette();
 
 	void _run(bool p_current = false, const String &p_custom = "");

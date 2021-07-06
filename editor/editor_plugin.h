@@ -88,7 +88,7 @@ public:
 	Array get_open_scenes() const;
 	ScriptEditor *get_script_editor();
 
-	Ref<EditorCommandPalette> get_editor_palette();
+	Ref<EditorCommandPalette> get_command_palette();
 
 	void select_file(const String &p_file);
 	String get_selected_path() const;

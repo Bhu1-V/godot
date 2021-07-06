@@ -54,12 +54,11 @@ float EditorCommandPalette::_score_path(const String &p_search, const String &p_
 	return score * 0.69f;
 }
 
-void EditorCommandPalette::_update_command_search() {
+void EditorCommandPalette::_update_command_search(const String &search_text) {
 	commands.get_key_list(&command_keys);
 	ERR_FAIL_COND(command_keys.is_empty());
 
-
-	const String search_text = command_search_box->get_text();
+	// const String search_text = command_search_box->get_text();
 	const bool empty_search = search_text.is_empty();
 
 	// Filter possible candidates.
@@ -68,7 +67,7 @@ void EditorCommandPalette::_update_command_search() {
 		CommandEntry r;
 		r.key_name = command_keys[i];
 		r.display_name = commands[r.key_name].name;
-		if (!empty_search && search_text.is_subsequence_ofi(r.display_name)) {
+		if (!empty_search || search_text.is_subsequence_ofi(r.display_name)) {
 			r.score = empty_search ? 0 : _score_path(search_text, r.display_name.to_lower());
 			entries.push_back(r);
 		}
@@ -88,7 +87,7 @@ void EditorCommandPalette::_update_command_search() {
 		const int entry_limit = MIN(entries.size(), 300);
 		for (int i = 0; i < entry_limit; i++) {
 			TreeItem *ti = search_options->create_item(root);
-			ti->set_tooltip(0, entries[i].key_name);
+			ti->set_metadata(0, entries[i].key_name);
 			ti->set_text(0, entries[i].display_name);
 		}
 
@@ -106,8 +105,7 @@ void EditorCommandPalette::_update_command_search() {
 }
 
 void EditorCommandPalette::_bind_methods() {
-	ADD_SIGNAL(MethodInfo("execute_command"));
-	ADD_SIGNAL(MethodInfo("open_resource"));
+	// to-do: bind methods.
 }
 
 void EditorCommandPalette::_sbox_input(const Ref<InputEvent> &p_ie) {
@@ -127,17 +125,8 @@ void EditorCommandPalette::_sbox_input(const Ref<InputEvent> &p_ie) {
 
 void EditorCommandPalette::_confirmed() {
 	TreeItem *selected_option = search_options->get_selected();
-	set_selected_commmad(selected_option->get_tooltip(0));
-	emit_signal("execute_command");
 	hide();
-}
-
-void EditorCommandPalette::set_selected_commmad(String command) {
-	selected_command = command;
-}
-
-String EditorCommandPalette::get_selected_command() {
-	return selected_command;
+	execute_command(selected_option->get_metadata(0));
 }
 
 void EditorCommandPalette::open_popup() {
@@ -164,9 +153,9 @@ void EditorCommandPalette::add_command(String p_command_name, String p_key_name,
 	commands[p_key_name] = p_command;
 }
 
-void EditorCommandPalette::execute_command(String p_command_name) {
-	ERR_FAIL_COND_MSG(!commands.has(p_command_name), p_command_name + " not found.");
-	commands[p_command_name].callable.call_deferred(nullptr, 0);
+void EditorCommandPalette::execute_command(String p_command_key) {
+	ERR_FAIL_COND_MSG(!commands.has(p_command_key), p_command_key + " not found.");
+	commands[p_command_key].callable.call_deferred(nullptr, 0);
 }
 
 void EditorCommandPalette::register_shortcuts_as_command() {
@@ -191,12 +180,16 @@ Ref<Shortcut> EditorCommandPalette::add_shortcut_command(const String &p_command
 		ev->set_shortcut(p_shortcut);
 		add_command(p_command, p_key, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
 	} else {
-		const String command_name = String(p_command);
 		const String key_name = String(p_key);
+		const String command_name = String(p_command);
 		Pair p_pair = Pair(command_name, p_shortcut);
 		unregisterd_shortcuts[key_name] = p_pair;
 	}
 	return p_shortcut;
+}
+
+void EditorCommandPalette::_theme_changed() {
+	command_search_box->set_right_icon(search_options->get_theme_icon("Search", "EditorIcons"));
 }
 
 EditorCommandPalette *EditorCommandPalette::get_singleton() {
@@ -207,17 +200,15 @@ EditorCommandPalette *EditorCommandPalette::get_singleton() {
 }
 
 EditorCommandPalette::EditorCommandPalette() {
-	allow_multi_select = false;
-
 	VBoxContainer *vbc = memnew(VBoxContainer);
-	// todo: add theme change signal handler
+	vbc->connect("theme_changed", callable_mp(this, &EditorCommandPalette::_theme_changed));
 	add_child(vbc);
 
 	command_search_box = memnew(LineEdit);
 	command_search_box->set_placeholder("search for a command");
 	command_search_box->set_placeholder_alpha(0.5);
 	command_search_box->connect("gui_input", callable_mp(this, &EditorCommandPalette::_sbox_input));
-	command_search_box->connect("text_changed", callable_mp(this, &EditorCommandPalette::_update_command_search).unbind(1));
+	command_search_box->connect("text_changed", callable_mp(this, &EditorCommandPalette::_update_command_search));
 	command_search_box->connect("text_submitted", callable_mp(this, &EditorCommandPalette::_confirmed).unbind(1));
 	vbc->add_margin_child(TTR("Search:"), command_search_box);
 	register_text_enter(command_search_box);

@@ -3697,13 +3697,6 @@ void EditorNode::_quick_run() {
 	_run(false, quick_run->get_selected());
 }
 
-void EditorNode::_execute_command() {
-	String selected_command = command_palette->get_selected_command();
-	ERR_FAIL_COND(selected_command.is_empty());
-	command_palette->execute_command(selected_command);
-	command_palette->set_selected_commmad("");
-}
-
 void EditorNode::notify_all_debug_sessions_exited() {
 	_menu_option_confirm(RUN_STOP, false);
 	stop_button->set_pressed(false);
@@ -6198,7 +6191,6 @@ EditorNode::EditorNode() {
 
 	command_palette = EditorCommandPalette::get_singleton();
 	gui_base->add_child(command_palette);
-	command_palette->connect("execute_command", callable_mp(this, &EditorNode::_execute_command));
 
 	PopupMenu *p;
 

@@ -29,10 +29,10 @@
 /*************************************************************************/
 
 #include "shortcut.h"
-
-#include "core/os/keyboard.h"
+#include "core\os\keyboard.h"
 
 void Shortcut::set_shortcut(const Ref<InputEvent> &p_shortcut) {
+	ERR_FAIL_COND(Object::cast_to<InputEventShortcut>(*p_shortcut));
 	shortcut = p_shortcut;
 	emit_changed();
 }
