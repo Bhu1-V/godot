@@ -47,11 +47,13 @@ class EditorCommandPalette : public ConfirmationDialog {
 	struct Command {
 		Callable callable;
 		String name;
+		String shortcut;
 	};
 
 	struct CommandEntry {
 		String key_name;
 		String display_name;
+		String shortcut_text;
 		float score;
 	};
 
@@ -81,7 +83,7 @@ protected:
 public:
 	void open_popup();
 	void get_actions_list(List<String> *p_list) const;
-	void add_command(String p_command_name, String p_key_name, Callable p_action, Vector<Variant> arguments);
+	void add_command(String p_command_name, String p_key_name, Callable p_action, Vector<Variant> arguments, String p_shortcut_text = "");
 	void execute_command(String p_command_name);
 	void register_shortcuts_as_command();
 	Ref<Shortcut> add_shortcut_command(const String &p_command, const String &p_key, Ref<Shortcut> p_shortcut);

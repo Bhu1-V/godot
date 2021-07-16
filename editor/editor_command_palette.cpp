@@ -67,6 +67,7 @@ void EditorCommandPalette::_update_command_search(const String &search_text) {
 		CommandEntry r;
 		r.key_name = command_keys[i];
 		r.display_name = commands[r.key_name].name;
+		r.shortcut_text = commands[r.key_name].shortcut;
 		if (!empty_search || search_text.is_subsequence_ofi(r.display_name)) {
 			r.score = empty_search ? 0 : _score_path(search_text, r.display_name.to_lower());
 			entries.push_back(r);
@@ -87,8 +88,13 @@ void EditorCommandPalette::_update_command_search(const String &search_text) {
 		const int entry_limit = MIN(entries.size(), 300);
 		for (int i = 0; i < entry_limit; i++) {
 			TreeItem *ti = search_options->create_item(root);
-			ti->set_metadata(0, entries[i].key_name);
+			String shortcut_text = entries[i].shortcut_text == "None" ? "" : entries[i].shortcut_text;
 			ti->set_text(0, entries[i].display_name);
+			ti->set_metadata(0, entries[i].key_name);
+			ti->set_text_align(1, TreeItem::TextAlign::ALIGN_RIGHT);
+			ti->set_text(1, shortcut_text);
+			Color c = Color(125, 125, 125);
+			ti->set_custom_color(1, c);
 		}
 
 		TreeItem *to_select = root->get_first_child();
@@ -139,7 +145,7 @@ void EditorCommandPalette::get_actions_list(List<String> *p_list) const {
 	commands.get_key_list(p_list);
 }
 
-void EditorCommandPalette::add_command(String p_command_name, String p_key_name, Callable p_action, Vector<Variant> arguments) {
+void EditorCommandPalette::add_command(String p_command_name, String p_key_name, Callable p_action, Vector<Variant> arguments, String p_shortcut_text) {
 	ERR_FAIL_COND_MSG(commands.has(p_key_name), "The EditorAction '" + String(p_command_name) + "' already exists. Unable to add it.");
 
 	const Variant **argptrs = (const Variant **)alloca(sizeof(Variant *) * arguments.size());
@@ -149,6 +155,7 @@ void EditorCommandPalette::add_command(String p_command_name, String p_key_name,
 	Command p_command;
 	p_command.name = p_command_name;
 	p_command.callable = p_action.bind(argptrs, arguments.size());
+	p_command.shortcut = p_shortcut_text;
 
 	commands[p_key_name] = p_command;
 }
@@ -167,7 +174,8 @@ void EditorCommandPalette::register_shortcuts_as_command() {
 		Ref<InputEventShortcut> ev;
 		ev.instantiate();
 		ev->set_shortcut(p_shortcut);
-		add_command(command_name, *p_key, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
+		String shortcut_text = String(p_shortcut->get_as_text());
+		add_command(command_name, *p_key, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false), shortcut_text);
 		p_key = unregisterd_shortcuts.next(p_key);
 	}
 	unregisterd_shortcuts.clear();
@@ -178,7 +186,8 @@ Ref<Shortcut> EditorCommandPalette::add_shortcut_command(const String &p_command
 		Ref<InputEventShortcut> ev;
 		ev.instantiate();
 		ev->set_shortcut(p_shortcut);
-		add_command(p_command, p_key, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false));
+		String shortcut_text = String(p_shortcut->get_as_text());
+		add_command(p_command, p_key, callable_mp(EditorNode::get_singleton()->get_viewport(), &Viewport::unhandled_input), varray(ev, false), shortcut_text);
 	} else {
 		const String key_name = String(p_key);
 		const String command_name = String(p_command);
@@ -219,6 +228,7 @@ EditorCommandPalette::EditorCommandPalette() {
 	search_options->set_hide_root(true);
 	search_options->set_hide_folding(true);
 	search_options->add_theme_constant_override("draw_guides", 1);
+	search_options->set_columns(2);
 	vbc->add_margin_child(TTR("Matches:"), search_options, true);
 }
 
